@@ -1,0 +1,282 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: 'tr'
+    platform_id: 3
+    base_url: '%env(resolve:BASE_URL)%'
+    mailer_from: '%env(resolve:MAILER_FROM)%'
+    bircom_merchant_key: '%env(resolve:BIRCOM_MERCHANT_KEY)%'
+
+    redis_dns: 'redis://%env(resolve:REDIS_PASSWORD)%@%env(resolve:REDIS_HOST)%:%env(resolve:REDIS_PORT)%'
+
+    private_folder_path: '%env(resolve:RESOURCE_FOLDER_PATH)%'
+
+    bank_transfer_document_path: '%private_folder_path%/private/uploads/bank_transfer_documents'
+    merchant_contract_file_directory: '%private_folder_path%/private/uploads/merchant/files/contract'
+    merchant_signature_file_directory: '%private_folder_path%/private/uploads/merchant/files/signature'
+    merchant_tax_file_directory: '%private_folder_path%/private/uploads/merchant/files/tax'
+    merchant_journal_file_directory: '%private_folder_path%/private/uploads/merchant/files/journal'
+
+    payment_order_callback_url: '%env(resolve:PAYMENT_ORDER_CALLBACK_URL)%'
+    payment_e_callback_url: '%env(resolve:PAYMENT_E_CALLBACK_URL)%'
+
+    product_api_url: '%env(resolve:PRODUCT_API_BASE_URL)%'
+    product_api_auth_username: '%env(resolve:PRODUCT_API_AUTH_USERNAME)%'
+    product_api_auth_password: '%env(resolve:PRODUCT_API_AUTH_PASSWORD)%'
+
+    payment_api_url: '%env(resolve:PAYMENT_API_BASE_URL)%'
+    payment_api_auth_username: '%env(resolve:PAYMENT_API_AUTH_USERNAME)%'
+    payment_api_auth_password: '%env(resolve:PAYMENT_API_AUTH_PASSWORD)%'
+
+    cdn_username: '%env(resolve:CDN_USERNAME)%'
+    cdn_password: '%env(resolve:CDN_PASSWORD)%'
+    cdn_url: '%env(resolve:CDN_BASE_URL)%'
+    cdn_image_url: '%env(resolve:CDN_IMAGE_URL)%'
+    cdn_document_url: '%env(resolve:CDN_DOCUMENT_URL)%'
+    cdn_assets_base_url: '%env(resolve:CDN_ASSETS_BASE_URL)%'
+
+    web_push_base_url: '%env(resolve:WEB_PUSH_BASE_URL)%'
+    web_push_server_key: '%env(resolve:WEB_PUSH_SERVER_KEY)%'
+
+    netsis_api_base_url: '%env(resolve:NETSIS_API_BASE_URL)%'
+    netsis_api_token: '%env(resolve:NETSIS_API_TOKEN)%'
+
+    e_invoice_api_base_url: '%env(resolve:E_INVOICE_API_BASE_URL)%'
+
+    salesforce_api_base_url: '%env(resolve:SALESFORCE_API_BASE_URL)%'
+    salesforce_api_token: '%env(resolve:SALESFORCE_API_TOKEN)%'
+
+    codec_username: '%env(resolve:CODEC_USERNAME)%'
+    codec_password: '%env(resolve:CODEC_PASSWORD)%'
+    codec_sender: '%env(resolve:CODEC_SENDER)%'
+    codec_service_code: '%env(resolve:CODEC_SERVICE_CODE)%'
+    codec_fast_api_wsdl: '%env(resolve:CODEC_FAST_API_WSDL)%'
+    codec_bulk_api_wsdl: '%env(resolve:CODEC_BULK_API_WSDL)%'
+
+    person_giver: '%env(resolve:PERSON_GIVER)%'
+    yurtici_username: '%env(resolve:YURTICI_USERNAME)%'
+    yurtici_password: '%env(resolve:YURTICI_PASSWORD)%'
+    yurtici_inv_cust_id: '%env(resolve:YURTICI_INV_CUST_ID)%'
+    yurtici_default_language: '%env(resolve:YURTICI_DEFAULT_LANGUAGE)%'
+    yurtici_ngi_customer_address_service_wsdl: '%env(resolve:YURTICI_NGI_CUSTOMER_ADDRESS_SERVICE_WSDL)%'
+    yurtici_ngi_shipment_interface_service_wsdl: '%env(resolve:YURTICI_NGI_SHIPMENT_INTERFACE_ADDRESS_SERVICE_WSDL)%'
+    yurtici_ws_report_with_reference_service_wsdl: '%env(resolve:YURTICI_WS_REPORT_WITH_REFERENCE_SERVICE_WSDL)%'
+    yurtici_tracking_url: '%env(resolve:YURTICI_TRACKING_URL)%'
+
+
+    sms_mersis_no: '%env(resolve:SMS_MERSIS_NO)%'
+    sms_cancel: '%env(resolve:SMS_CANCEL)%'
+
+    manager_mail: '%env(resolve:MANAGER_MAIL)%'
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\Admin\:
+        resource: '../src/Controller/Admin'
+        tags: ['controller.service_arguments']
+    App\Controller\Front\:
+        resource: '../src/Controller/Front'
+        tags: ['controller.service_arguments']
+
+    # EntryPoints
+    app.entry_point.api_authentication_entry_point:
+        class: App\EntryPoint\ApiAuthenticationEntryPoint
+        arguments: [ 'xxx API' ]
+
+    # Services
+    app.sms.codec_provider:
+        alias: App\Service\Sms\Providers\CodecProvider
+        public: true
+    App\Service\SmsService:
+        public: true
+        arguments:
+            $provider: '@app.sms.codec_provider'
+    app.cargo.yurtici_provider:
+        alias: App\Service\Cargo\Providers\YurticiCargoProvider
+        public: true
+    App\Service\CargoService:
+        arguments:
+            $provider: '@app.cargo.yurtici_provider'
+        public: true
+
+    # Public
+    App\Service\ExchangeService:
+        public: true
+    App\Service\AddressService:
+        public: true
+    App\Service\NetsisService:
+        public: true
+    App\Service\ProductManagement\ReportService:
+        public: true
+    App\Service\UserService:
+        public: true
+    App\Service\MerchantService:
+        public: true
+    App\Service\BasketService:
+        public: true
+    App\Service\OrderService:
+        public: true
+    App\Service\ProductService:
+        public: true
+    App\Service\MailService:
+        public: true
+    App\Service\PaymentManagement\PaymentService:
+        public: true
+
+    twig.mobile_detect_extension:
+        class: Bes\Twig\Extension\MobileDetectExtension
+        tags:
+            - { name: twig.extension }
+
+    App\Controller\Front\FrontExceptionController:
+        public: true
+        arguments:
+            $debug: '%kernel.debug%'
+
+    # Listeners (Entity)
+    app.entity.main_page_product_listener:
+        class: App\EventListener\MainPageProductEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MainPageProduct, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MainPageProduct, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MainPageProduct, method: postRemove}
+
+    app.entity.banner_listener:
+        class: App\EventListener\BannerEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Banner, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Banner, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Banner, method: postRemove}
+
+    app.entity.notification_listener:
+        class: App\EventListener\NotificationEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Notification, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Notification, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Notification, method: postRemove}
+
+    app.entity.user_listener:
+        class: App\EventListener\UserEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\User, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\User, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\User, method: postRemove}
+
+    app.entity.merchant_listener:
+        class: App\EventListener\MerchantEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Merchant, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Merchant, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Merchant, method: postRemove}
+
+    app.entity.category_listener:
+        class: App\EventListener\CategoryEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Category, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Category, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Category, method: postRemove}
+
+    app.entity.product_comment_listener:
+        class: App\EventListener\ProductCommentEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\ProductComment, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\ProductComment, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\ProductComment, method: postRemove}
+
+    app.entity.wish_list_product_listener:
+        class: App\EventListener\WishListProductEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\WishListProduct, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\WishListProduct, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\WishListProduct, method: postRemove}
+
+    app.entity.merchant_review_listener:
+        class: App\EventListener\MerchantReviewEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MerchantReview, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MerchantReview, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MerchantReview, method: postRemove}
+
+    app.entity.order_listener :
+        class: App\EventListener\OrderEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Order, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Order, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Order, method: postRemove}
+
+    app.entity.order_product_listener :
+        class: App\EventListener\OrderProductEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\OrderProduct, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\OrderProduct, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\OrderProduct, method: postRemove}
+
+    app.entity.merchant_history_listener :
+        class: App\EventListener\MerchantHistoryEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\OrderProduct, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\OrderProduct, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\OrderProduct, method: postRemove}
+
+    app.entity.merchant_contact_listener:
+        class: App\EventListener\MerchantContactEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MerchantContact, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MerchantContact, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MerchantContact, method: postRemove}
+
+    app.entity.defective_product_listener:
+        class: App\EventListener\DefectiveProductEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\DefectiveProduct, method: postPersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\DefectiveProduct, method: postUpdate}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\DefectiveProduct, method: postRemove}
+
+    app.entity.merchant_sector_history_listener :
+        class: App\EventListener\MerchantSectorHistoryEventListener
+        arguments: ["@event_dispatcher"]
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MerchantSectorHistory, method: prePersist}
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\MerchantSectorHistory, method: preUpdate}
+    # Listeners (Exception)
+    app.event_listener.exception_listener:
+        class: App\EventListener\ExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException}
+
+    # Listeners (Request)
+    app.event_listener.request_listener:
+        class: App\EventListener\UserSessionEventListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: -1}
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones

@@ -1,0 +1,86 @@
+security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+            cost: 12
+        Symfony\Component\Security\Core\User\User: plaintext
+    role_hierarchy:
+        ROLE_API_USER: ROLE_USER
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SALES_TEAM: [ROLE_ADMIN, ROLE_USER]
+        ROLE_ACCOUNTING_TEAM: [ROLE_ADMIN, ROLE_USER, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_MANAGER: [ROLE_ADMIN, ROLE_USER, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH, ROLE_SALES_TEAM, ROLE_ACCOUNTING_TEAM, ROLE_MANAGER]
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+        api_user_provider:
+            memory:
+                users:
+                    product_api_user:
+                        password: M63GHUTXP5YWK4HVOBBUWUJSLJYCQ7Y7ZJPZI7X7MM2BUFKGLB04IL40QFVN
+                        roles: [ROLE_API_USER]
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        api:
+            pattern: ^/api
+            stateless: true
+            entry_point: app.entry_point.api_authentication_entry_point
+            http_basic:
+                realm: "xxx API"
+                provider: api_user_provider
+        main:
+            anonymous: true
+            access_denied_handler: App\Security\AccessDeniedHandler
+            provider: app_user_provider
+            guard:
+                authenticators:
+                    - App\Security\LoginFormAuthenticator
+            logout:
+                path: /cikis
+                target: /giris
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 week in seconds
+                path: /
+                secure: true
+                remember_me_parameter: 'remember_me'
+            switch_user: true
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/api, roles: ROLE_API_USER }
+        - { path: ^/giris, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/kaydol, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/hakkimizda, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/iletisim, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/cities, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/sifremi-unuttum, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/sifre-sifirla, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/sms-iptal-talebi, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/send-phone-verification-code, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/verify-verification-code, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/checkout/callback/order, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/checkout/callback/epayment, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/merchants/active-merchants, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/merchants/find/email, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/merchants/find/tax-number, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/users/active-users, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/users/find/national-id, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/orders/check-campaign-usage, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/dashboard, roles: ROLE_ADMIN }
+        - { path: ^/, roles: ROLE_USER }
+        # - { path: ^/profile, roles: ROLE_USER }

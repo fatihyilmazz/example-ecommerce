@@ -1,0 +1,11 @@
+admin_controllers:
+    resource: ../../src/Controller/Admin/
+    type: annotation
+    prefix: 'dashboard'
+front_controllers:
+    resource: ../../src/Controller/Front/
+    type: annotation
+api_controllers:
+    resource: ../../src/Controller/Api/
+    type: annotation
+    prefix: 'api'

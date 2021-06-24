@@ -1,0 +1,55 @@
+doctrine:
+    orm:
+        auto_generate_proxy_classes: false
+        metadata_cache_driver:
+            type: service
+            id: app.doctrine.service.redis_cache
+        query_cache_driver:
+            type: service
+            id: app.doctrine.service.redis_cache
+        result_cache_driver:
+            type: service
+            id: app.doctrine.service.redis_cache
+
+services:
+    doctrine.result_cache_provider:
+        class: Symfony\Component\Cache\DoctrineProvider
+        public: false
+        arguments:
+            - '@doctrine.result_cache_pool'
+    doctrine.system_cache_provider:
+        class: Symfony\Component\Cache\DoctrineProvider
+        public: false
+        arguments:
+            - '@doctrine.system_cache_pool'
+
+    Redis:
+        class: Redis
+        calls:
+            - method: connect
+              arguments:
+                  - '%env(REDIS_HOST)%'
+                  - '%env(int:REDIS_PORT)%'
+            - method: setOption
+              arguments:
+                  - !php/const Redis::OPT_PREFIX
+                  - '%env(REDIS_PREFIX)%'
+            - method: auth
+              arguments:
+                  - '%env(REDIS_PASSWORD)%'
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+        arguments:
+            - '@Redis'
+    app.doctrine.service.redis_cache:
+        class: Doctrine\Common\Cache\RedisCache
+        calls:
+            - method: setRedis
+              arguments:
+                  - '@Redis'
+framework:
+    cache:
+        pools:
+            doctrine.result_cache_pool:
+                adapter: cache.app
+            doctrine.system_cache_pool:
+                adapter: cache.system

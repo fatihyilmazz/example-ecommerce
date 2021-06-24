@@ -1,0 +1,28 @@
+# System message group
+system:
+    not_found:
+        product: 'Ürün bulunamadı'
+        installment: 'Taksit bulunamadı'
+        sector_number: 'Geçersiz sektör numarası.'
+    error:
+        unknown: 'Bir hata oluştu. Lütfen destek ekibi ile iletişime geçin.'
+        password_reset: 'Bir sorun nedeniyle şifre sıfırlama işleminiz tamamlanamadı. Lütfen tekrar deneyiniz.'
+        failed: 'İşlem gerçekleştirilemedi.'
+        unexpected_error: 'Beklenmedik bir hata nedeniyle işleminiz tamamlanamadı.'
+        payment:
+            bank_transfer:
+                document_upload_error: 'Dekont görseli yüklenemedi.'
+
+            not_found: 'Ana kategorisini listeye eklenmediğiniz kategorileri kaydedemezsiniz'
+        changed: '{sectorName} sektörüne geçiş yapıldı.'
+        not_allowed: 'İşletmenizin {sectorName} sektörü için erişimi yoktur.'
+
+# Validation message group
+validation:
+    invalid:
+        parameter: 'Geçersiz parametre.'
+
+# Security message group
+security:
+    denied:
+

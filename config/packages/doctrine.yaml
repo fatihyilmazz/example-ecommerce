@@ -1,0 +1,36 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                # configure these for your database server
+                url: '%env(resolve:DATABASE_URL)%'
+                driver: 'pdo_mysql'
+                server_version: '5.7'
+                charset: utf8mb4
+                default_table_options:
+                    charset: utf8mb4
+                    collate: utf8mb4_unicode_ci
+    orm:
+        dql:
+            datetime_functions:
+                YEARWEEK: DoctrineExtensions\Query\Mysql\YearWeek
+                LAST_DAY: DoctrineExtensions\Query\Mysql\LastDay
+                DATE_FORMAT: DoctrineExtensions\Query\Mysql\DateFormat
+                STR_TO_DATE: DoctrineExtensions\Query\Mysql\StrToDate
+                CONCAT_WS: DoctrineExtensions\Query\Mysql\ConcatWs
+            string_functions:
+                JSON_CONTAINS: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContains
+        auto_generate_proxy_classes: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+        mappings:
+            App:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+#        metadata_cache_driver: apcu
+#        query_cache_driver: apcu
+#        result_cache_driver: apcu

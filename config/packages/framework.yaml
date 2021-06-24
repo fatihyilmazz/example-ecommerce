@@ -1,0 +1,25 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    #default_locale: '%locale%'
+    #csrf_protection: true
+    #http_method_override: true
+
+    # Enables session support. Note that the session will ONLY be started if you read or write from it.
+    # Remove or comment this section to explicitly disable session support.
+    session:
+        name: 'xxx_PHPSESSID'
+        handler_id: ~
+        cookie_secure: auto
+        cookie_samesite: lax
+        cookie_lifetime: 21600 # 6 hours
+
+    #esi: true
+    #fragments: true
+    php_errors:
+        log: true
+    assets:
+        packages:
+            cdn:
+                base_urls:
+                    ssl: '%cdn_assets_base_url%'
+                    http: '%cdn_assets_base_url%'

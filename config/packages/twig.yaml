@@ -1,0 +1,35 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    debug: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'
+    form_themes: ['bootstrap_4_horizontal_layout.html.twig']
+    globals:
+        base_url : '%base_url%'
+        image_base_url: '%cdn_image_url%'
+        document_base_url: '%cdn_document_url%'
+        cdn_assets_base_url: '%cdn_assets_base_url%'
+
+        CURRENCY_CODE_TL: 'TL'
+        CURRENCY_CODE_TRY: 'TRY'
+        CURRENCY_CODE_USD: 'USD'
+        CURRENCY_CODE_EUR: 'EUR'
+
+        CURRENCY_ID_TL: 1
+        CURRENCY_ID_TRY: 1
+        CURRENCY_ID_USD: 2
+        CURRENCY_ID_EUR: 3
+
+        CURRENT_YEAR: '2020'
+        TELEPHONE: '0(212) 319 97 97'
+        FAX_NUMBER: '0(212) 284 76 80'
+
+        PAYMENT_METHOD_CARD: 1
+        PAYMENT_METHOD_BANK_TRANSFER: 2
+        PAYMENT_METHOD_FORWARD_SALE: 3
+
+#        merchant_contract_file_directory: '%merchant_contract_file_directory%'
+#        merchant_signature_file_directory: '%merchant_signature_file_directory%'
+#        merchant_tax_file_directory: '%merchant_tax_file_directory%'
+#        merchant_journal_file_directory: '%merchant_journal_file_directory%'
+#
+#        order_bank_transfer_image_directory: '%bank_transfer_document_path%'
